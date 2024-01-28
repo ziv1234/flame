@@ -12,12 +12,26 @@ void main() {
   runApp(const GameWidget.controlled(gameFactory: Forge2DExample.new));
 }
 
+// Fixed viewport size
+final screenSize = Vector2(720, 1280);
+
+// Scaled viewport size
+const scale = 100.0;
+final worldSize = screenSize / scale;
+
 class Forge2DExample extends Forge2DGame {
+  Forge2DExample()
+      : super(
+          zoom: scale,
+          cameraComponent: CameraComponent.withFixedResolution(
+              width: screenSize.x, height: screenSize.y),
+          gravity: Vector2(0, 10),
+        );
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-
     camera.viewport.add(FpsTextComponent());
+    await loadSprite('apple.png');
     world.add(Ball());
     world.addAll(createBoundaries());
   }
@@ -57,6 +71,19 @@ class Ball extends BodyComponent with TapCallbacks {
             type: BodyType.dynamic,
           ),
         );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    final sprite = Sprite(game.images.fromCache('apple.png'));
+    add(
+      SpriteComponent(
+        sprite: sprite,
+        size: Vector2(10, 10),
+        anchor: Anchor.center,
+      ),
+    );
+  }
 
   @override
   void onTapDown(_) {
