@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flame/palette.dart';
 
 void main() {
   runApp(const GameWidget.controlled(gameFactory: Forge2DExample.new));
@@ -21,13 +24,16 @@ class Forge2DExample extends Forge2DGame {
 
   List<Component> createBoundaries() {
     final visibleRect = camera.visibleWorldRect;
-    final topLeft = visibleRect.topLeft.toVector2();
-    final topRight = visibleRect.topRight.toVector2();
-    final bottomRight = visibleRect.bottomRight.toVector2();
-    final bottomLeft = visibleRect.bottomLeft.toVector2();
+    final left = lerpDouble(visibleRect.left, visibleRect.right, 0.2);
+    final right = lerpDouble(visibleRect.left, visibleRect.right, 0.8);
+    final top = lerpDouble(visibleRect.top, visibleRect.bottom, 0.3);
+    final bottom = lerpDouble(visibleRect.top, visibleRect.bottom, 0.9);
+    final topLeft = Vector2(left!, top!);
+    final topRight = Vector2(right!, top);
+    final bottomLeft = Vector2(left, bottom!);
+    final bottomRight = Vector2(right, bottom);
 
     return [
-      Wall(topLeft, topRight),
       Wall(topRight, bottomRight),
       Wall(bottomLeft, bottomRight),
       Wall(topLeft, bottomLeft),
@@ -40,7 +46,7 @@ class Ball extends BodyComponent with TapCallbacks {
       : super(
           fixtureDefs: [
             FixtureDef(
-              CircleShape()..radius = 5,
+              CircleShape()..radius = 2,
               restitution: 0.8,
               friction: 0.4,
             ),
@@ -73,5 +79,12 @@ class Wall extends BodyComponent {
     );
 
     return world.createBody(bodyDef)..createFixture(fixtureDef);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final Paint paint = BasicPalette.white.paint()
+      ..strokeWidth = 0.3; // You can customize the color
+    canvas.drawLine(_start.toOffset(), _end.toOffset(), paint);
   }
 }
