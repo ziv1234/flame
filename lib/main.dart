@@ -27,6 +27,7 @@ class Forge2DExample extends Forge2DGame {
               width: screenSize.x, height: screenSize.y),
           gravity: Vector2(0, 10),
         );
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -60,7 +61,7 @@ class Ball extends BodyComponent with TapCallbacks {
       : super(
           fixtureDefs: [
             FixtureDef(
-              CircleShape()..radius = 2,
+              CircleShape()..radius = 0.3,
               restitution: 0.8,
               friction: 0.4,
             ),
@@ -76,10 +77,11 @@ class Ball extends BodyComponent with TapCallbacks {
   Future<void> onLoad() async {
     await super.onLoad();
     final sprite = Sprite(game.images.fromCache('apple.png'));
+    paint = Paint()..color = const Color(0x00000000);
     add(
       SpriteComponent(
         sprite: sprite,
-        size: Vector2(10, 10),
+        size: Vector2(0.9, 0.9),
         anchor: Anchor.center,
       ),
     );
@@ -88,6 +90,12 @@ class Ball extends BodyComponent with TapCallbacks {
   @override
   void onTapDown(_) {
     body.applyLinearImpulse(Vector2.random() * 5000);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    // Render the sprite instead of the CircleShape
+    super.render(canvas);
   }
 }
 
